@@ -27,27 +27,28 @@ import "./Board.css";
  *
  **/
 
-function Board({ nrows=3, ncols=3, chanceLightStartsOn=0.5 }) {
+function Board({ nrows, ncols, chanceLightStartsOn }) {
   const [board, setBoard] = useState(createBoard());
 
   /** create a board nrows high/ncols wide, each cell randomly lit or unlit */
   function createBoard() {
     let initialBoard = [];
     // TODO: create array-of-arrays of true/false values
-    for (let y = 0; nrows > y; y++) {
+    for (let y = 0; y < nrows; y++) {
       let row = [];
-      for (let x = 0; ncols > x; x++) {
+      for (let x = 0; x < ncols; x++) {
         row.push(Math.random() < chanceLightStartsOn);
       }
       initialBoard.push(row);
+
     }
     return initialBoard;
   }
 
   function hasWon() {
     // TODO: check the board in state to determine whether the player has won.
-    for (let y = 0; nrows > y; y++) {
-      if (board[y].includes(false)) {
+    for (let y = 0; y < nrows; y++) {
+      if (board[y].includes(false)) { // use every as chain
         return false;
       }
     }
@@ -67,13 +68,13 @@ function Board({ nrows=3, ncols=3, chanceLightStartsOn=0.5 }) {
       };
 
       // TODO: Make a (deep) copy of the oldBoard
-      const boardCopy = [...oldBoard];
+      const boardCopy = [...oldBoard].map(cell => cell); // TODO: spread over the old object and map
 
       // TODO: in the copy, flip this cell and the cells around it
       flipCell(y, x, boardCopy);
       flipCell(y - 1, x, boardCopy);
       flipCell(y + 1, x, boardCopy);
-      flipCell(y, x - 1 , boardCopy);
+      flipCell(y, x - 1, boardCopy);
       flipCell(y, x + 1, boardCopy);
 
       // TODO: return the copy
@@ -81,20 +82,25 @@ function Board({ nrows=3, ncols=3, chanceLightStartsOn=0.5 }) {
     });
   }
 
+  function makeHTMLBoard(board) {
+    return board.map((row, y) =>
+      <tr key={y}>
+        {row.map((value, x) =>
+        <Cell key={`${y}-${x}`} isLit={value} flipCellsAroundMe={(evt) => flipCellsAround(`${y}-${x}`)} />)}
+      </tr>)
+  }
   // if the game is won, just show a winning msg & render nothing else
 
   // TODO
   return (
-  //   {if (hasWon) {
-  //     (<h1>You Won!</h1>)
-  //   }
-  // }
-    <Board />
+    <div>
+      { !hasWon() && <table><tbody>{makeHTMLBoard(board)}</tbody></table> }
+      { hasWon() && <p>You Won!</p> }
+    </div>
+    // make table board
+
+    // TODO
   )
-
-  // make table board
-
-  // TODO
 }
 
 export default Board;
